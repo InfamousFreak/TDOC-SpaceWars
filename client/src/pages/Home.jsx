@@ -3,7 +3,6 @@ import { gsap } from "gsap";
 
 const Home = () => {
   const [playerName, setPlayerName] = useState("");
-  const [isRegistered, setIsRegistered] = useState(false);
 
   // Refs for animation targets
   const titleRef = useRef(null);
@@ -48,11 +47,6 @@ const Home = () => {
     });
   }, []);
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    setIsRegistered(true);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 flex flex-col justify-center items-center text-white relative overflow-hidden">
       <h1
@@ -68,7 +62,7 @@ const Home = () => {
         <h2 className="text-xl font-semibold text-gray-200 mb-4 text-center">
           Enter the Battle Zone
         </h2>
-        <form onSubmit={handleRegister} className="flex flex-col items-center">
+        <form className="flex flex-col items-center">
           <input
             type="text"
             placeholder="Enter your name"
