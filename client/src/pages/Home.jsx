@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { useGlobalContext } from "../context";
 
 const Home = () => {
   const [playerName, setPlayerName] = useState("");
-
+  const { demo } = useGlobalContext();
   // Refs for animation targets
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
@@ -74,7 +75,7 @@ const Home = () => {
             type="submit"
             className="w-64 md:w-80 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-lg py-3 rounded-lg hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
           >
-            Register
+            REGISTER
           </button>
         </form>
       </div>
