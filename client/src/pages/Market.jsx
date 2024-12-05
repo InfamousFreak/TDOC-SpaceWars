@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import "../utilities/market.css";
+import "../utilities/scrollable.css";
 
 const skins = [
   {
@@ -47,6 +47,7 @@ const backgrounds = [
 const Market = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
   const skinsRef = useRef(null);
   const backgroundsRef = useRef(null);
   const skinsItemsRef = useRef([]);
@@ -61,9 +62,15 @@ const Market = () => {
     );
 
     gsap.fromTo(
+      subtitleRef.current,
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1, delay: 0.3, ease: "power4.out" }
+    );
+
+    gsap.fromTo(
       [skinsRef.current, backgroundsRef.current],
       { opacity: 0, scale: 0.9 },
-      { opacity: 1, scale: 1, duration: 1.2, delay: 0.5, ease: "power4.out" }
+      { opacity: 1, scale: 1, duration: 1.2, delay: 0.7, ease: "power4.out" }
     );
   }, []);
 
@@ -77,7 +84,7 @@ const Market = () => {
       >
         Galactic Marketplace
       </h1>
-      <p className="text-gray-400 mt-4 text-lg md:text-xl">
+      <p ref={subtitleRef} className="text-gray-400 mt-4 text-lg md:text-xl">
         Buy exclusive rocket skins and space backgrounds for your journey!
       </p>
 
