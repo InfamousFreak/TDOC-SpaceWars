@@ -8,7 +8,7 @@ import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 
 const App = () => {
-  console.log("App is rendering!"); // Debug log
+  console.log("App is rendering!");
 
   return (
     <BrowserRouter>
