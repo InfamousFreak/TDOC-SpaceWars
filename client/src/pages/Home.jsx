@@ -5,11 +5,22 @@ import { useGlobalContext } from "../context";
 const Home = () => {
   const [playerName, setPlayerName] = useState("");
   const { demo } = useGlobalContext();
-  // Refs for animation targets
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
   const formRef = useRef(null);
   const decorationsRef = useRef([]);
+
+  const handleClick = async () => {
+    try {
+      const playerExists = await contract.isPlayer(walletAddress);
+      if(!playerExists) {
+        await contract.registerPlayer(playerName, playerName);
+        
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
 
   useEffect(() => {
     // Title and Subtitle Animations
@@ -74,6 +85,7 @@ const Home = () => {
           <button
             type="submit"
             className="w-64 md:w-80 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-lg py-3 rounded-lg hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
+            onClick={handleClick}
           >
             REGISTER
           </button>

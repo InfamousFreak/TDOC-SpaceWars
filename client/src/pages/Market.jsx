@@ -71,7 +71,6 @@ const Market = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 flex flex-col items-center text-white overflow-hidden">
-      {/* Title */}
       <h1
         ref={titleRef}
         className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mt-10"
