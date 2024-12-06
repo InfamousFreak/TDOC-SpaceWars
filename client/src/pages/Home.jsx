@@ -1,26 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGlobalContext } from "../context";
+import { ethers } from "ethers";
 
 const Home = () => {
-  const [playerName, setPlayerName] = useState("");
-  const { demo } = useGlobalContext();
+  const { contract , walletAddress } = useGlobalContext();
+  const [username, setUsername] = useState("");
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
   const formRef = useRef(null);
   const decorationsRef = useRef([]);
 
-  const handleClick = async () => {
+  const handleRegister = async () => {
     try {
+      console.log(walletAddress);
+      console.log(contract||"null");
       const playerExists = await contract.isPlayer(walletAddress);
-      if(!playerExists) {
+
+      if (!playerExists) {
         await contract.registerPlayer(playerName, playerName);
+
+        setShowAlert({
+          status: true,
+          type: 'info',
+          message: `${username} is being summoned!`,
+        });
+
 
       }
     } catch (error) {
       alert(error);
     }
-  };
+  }
 
   useEffect(() => {
     // Title and Subtitle Animations
@@ -78,14 +89,14 @@ const Home = () => {
           <input
             type="text"
             placeholder="Enter your name"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-64 md:w-80 p-3 mb-4 text-black text-lg rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
             className="w-64 md:w-80 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-lg py-3 rounded-lg hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
-            onClick={handleClick}
+            onClick={handleRegister}
           >
             REGISTER
           </button>
