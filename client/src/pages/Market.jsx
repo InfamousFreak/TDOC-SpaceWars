@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import "../utilities/market.css";
+import "../utilities/scrollable.css";
 
 const skins = [
   {
@@ -47,6 +47,7 @@ const backgrounds = [
 const Market = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
   const skinsRef = useRef(null);
   const backgroundsRef = useRef(null);
   const skinsItemsRef = useRef([]);
@@ -61,9 +62,15 @@ const Market = () => {
     );
 
     gsap.fromTo(
+      subtitleRef.current,
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1, delay: 0.3, ease: "power4.out" }
+    );
+
+    gsap.fromTo(
       [skinsRef.current, backgroundsRef.current],
       { opacity: 0, scale: 0.9 },
-      { opacity: 1, scale: 1, duration: 1.2, delay: 0.5, ease: "power4.out" }
+      { opacity: 1, scale: 1, duration: 1.2, delay: 0.7, ease: "power4.out" }
     );
   }, []);
 
@@ -71,14 +78,13 @@ const Market = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 flex flex-col items-center text-white overflow-hidden">
-      {/* Title */}
       <h1
         ref={titleRef}
         className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mt-10"
       >
         Galactic Marketplace
       </h1>
-      <p className="text-gray-400 mt-4 text-lg md:text-xl">
+      <p ref={subtitleRef} className="text-gray-400 mt-4 text-lg md:text-xl">
         Buy exclusive rocket skins and space backgrounds for your journey!
       </p>
 

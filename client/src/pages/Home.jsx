@@ -1,15 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGlobalContext } from "../context";
+import { ethers } from "ethers";
 
 const Home = () => {
-  const [playerName, setPlayerName] = useState("");
-  const { demo } = useGlobalContext();
-  // Refs for animation targets
+  const { contract , walletAddress } = useGlobalContext();
+  const [username, setUsername] = useState("");
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
   const formRef = useRef(null);
   const decorationsRef = useRef([]);
+
+  const handleRegister = async () => {
+    try {
+      console.log(walletAddress);
+      console.log(contract||"null");
+      const playerExists = await contract.isPlayer(walletAddress);
+
+      if (!playerExists) {
+        await contract.registerPlayer(playerName, playerName);
+
+        setShowAlert({
+          status: true,
+          type: 'info',
+          message: `${username} is being summoned!`,
+        });
+
+
+      }
+    } catch (error) {
+      alert(error);
+    }
+  }
 
   useEffect(() => {
     // Title and Subtitle Animations
@@ -67,13 +89,14 @@ const Home = () => {
           <input
             type="text"
             placeholder="Enter your name"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-64 md:w-80 p-3 mb-4 text-black text-lg rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
             className="w-64 md:w-80 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-lg py-3 rounded-lg hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
+            onClick={handleRegister}
           >
             REGISTER
           </button>
@@ -92,6 +115,12 @@ const Home = () => {
           ref={(el) => (decorationsRef.current[2] = el)}
           className="absolute top-1/3 left-1/3 w-40 h-40 bg-purple-500 rounded-full blur-3xl"
         ></div>
+      </div>
+      {/* Floating Decorations */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-10 left-20 w-16 h-16 bg-blue-500 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-24 h-24 bg-pink-500 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/3 left-1/3 w-40 h-40 bg-purple-500 rounded-full blur-3xl animate-pulse"></div>
       </div>
     </div>
   );
