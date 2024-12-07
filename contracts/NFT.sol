@@ -5,9 +5,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract NFT is ERC721URIStorage {
 
-    uint private _tokenIds=0;
-
     constructor() ERC721("GameItem", "ITM") {}
+
+    uint private _tokenIds=0;
 
     function createNFT(string calldata tokenURI) public returns (uint256){
         _tokenIds++;
