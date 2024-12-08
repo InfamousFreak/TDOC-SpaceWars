@@ -1,10 +1,14 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { useGlobalContext } from "../context";
 
-const Profile = ({ userName, ownedNFTs }) => {
+const Profile = ({ ownedNFTs }) => {
+  const { contracts, accounts } = useGlobalContext();
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
   const nftSectionRef = useRef(null);
+
+  const [username, setUsername] = useState("userName");
 
   useEffect(() => {
     gsap.fromTo(
@@ -24,6 +28,13 @@ const Profile = ({ userName, ownedNFTs }) => {
       { opacity: 0, scale: 0.9 },
       { opacity: 1, scale: 1, duration: 1.2, delay: 0.7, ease: "power4.out" }
     );
+
+    const getPlayerName = async () => {
+      const name = await contracts.SpaceWars.methods.getPlayerName().call({from: accounts[0]});
+      setUsername(name);
+    }
+
+    getPlayerName();
   }, []);
 
   return (
@@ -33,7 +44,7 @@ const Profile = ({ userName, ownedNFTs }) => {
           ref={titleRef}
           className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
         >
-          userName's Profile
+          {username}
         </h1>
         <p
           ref={subtitleRef}

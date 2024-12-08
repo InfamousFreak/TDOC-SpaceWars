@@ -1,110 +1,55 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { ethers } from "ethers";
-import Web3Modal from "web3modal";
-import { ABI, ADDRESS } from "../contract";
+// import Web3Modal from "web3modal";
+import { NFT_ADDRESS, NFT_ABI, NFT_MarketPlace_ADDRESS, NFT_MarketPlace_ABI, SpaceWars_ADDRESS, SpaceWars_ABI } from '../contract/contractConfig.js';
+import Web3 from 'web3';
 
 const GlobalContext = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
-  const [walletAddress, setWalletAddress] = useState("");
-  const [provider, setProvider] = useState("");
-  const [contract, setContract] = useState("");
-  const [showAlert, setShowAlert] = useState({
-    status: "false",
-    type: "info",
-    message: "",
+
+  const [accounts, setAccounts] = useState([]);
+  const [contracts, setContracts] = useState({
+    NFT: '',
+    NFT_MarketPlace: '',
+    SpaceWars: ''
   });
 
   useEffect(() => {
-    if (showAlert?.status) {
-      const timer = setTimeout(() => {
-        setShowAlert({
-          status: "false",
-          type: "info",
-          message: "",
-        });
-      }, 5000);
+    try {
+      const web3 = new Web3(window.ethereum);
 
-      return () => clearTimeout(timer);
-    }
-  }, [showAlert]);
-
-  const updateCurrentWalletAddress = async () => {
-    if (window.ethereum) {
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts",
+      const NFT_Contract = new web3.eth.Contract(NFT_ABI, NFT_ADDRESS);
+      const NFT_MarketPlace_Contract = new web3.eth.Contract(NFT_MarketPlace_ABI, NFT_MarketPlace_ADDRESS);
+      const SpaceWars_Contract = new web3.eth.Contract(SpaceWars_ABI, SpaceWars_ADDRESS);
+      
+      setContracts({
+        NFT: NFT_Contract,
+        NFT_MarketPlace: NFT_MarketPlace_Contract,
+        SpaceWars: SpaceWars_Contract
       });
-      if (accounts) {
-        setWalletAddress(accounts[0]);
+
+      console.log(contracts);
+
+      const getAccounts = async () => {
+        await window.eth_requestAccounts;
+        const accounts = await web3.eth.getAccounts();
+        setAccounts(accounts);
+        console.log(accounts);
       }
-    } else {
-      setShowAlert({
-        status: "true",
-        type: "error",
-        message: "No wallet extension detected. Please install MetaMask.",
-      });
-      console.log("No wallet extension detected. Please install MetaMask.");
+
+      getAccounts();
     }
-  };
-
-  useEffect(() => {
-    updateCurrentWalletAddress();
+    catch (error) {
+      console.log(error);
+    }
   }, []);
-
-  useEffect(() => {
-    console.log("UseEffect triggered");
-    const setSmartContractAndProvider = async () => {
-      //   const web3Modal = new Web3Modal();
-      //   const connection = await web3Modal.connect();
-      console.log("function triggered");
-      console.log(ethers);
-      const newProvider = new ethers.BrowserProvider(
-        window.ethereum
-      );
-      console.log("Provider created: ", newProvider);
-      if (!newProvider) {
-        throw new Error("Failed to get provider");
-      }
-      const signer = await newProvider.getSigner();
-      const newContract = new ethers.Contract(ADDRESS, ABI, signer);
-
-      setProvider(newProvider);
-      setContract(newContract);
-    };
-
-    setSmartContractAndProvider();
-  }, []);
-
-  // useEffect(() => {
-  //     const setSmartContractAndProvider = async () => {
-  //         if (window.ethereum) {
-  //             const newProvider = ((window.ethereum != null) ? new ethers.providers.Web3Provider(window.ethereum) : ethers.providers.getDefaultProvider());
-  //             console.log(newProvider);
-  //             const signer = newProvider.getSigner();
-  //             const newContract = new ethers.Contract(ADDRESS, ABI, signer);
-
-  //             setProvider(newProvider);
-  //             setContract(newContract);
-  //         } else {
-  //             setShowAlert({
-  //                 status: "true",
-  //                 type: "error",
-  //                 message: "No wallet extension detected. Please install MetaMask."
-  //             });
-  //             console.log("No wallet extension detected. Please install MetaMask.");
-  //         }
-  //     };
-
-  //     setSmartContractAndProvider();
-  // }, []);
 
   return (
     <GlobalContext.Provider
       value={{
-        showAlert,
-        setShowAlert,
-        contract,
-        walletAddress,
+        accounts,
+        contracts,
+        setAccounts
       }}
     >
       {children}
