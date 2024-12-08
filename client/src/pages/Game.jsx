@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import spaceshipImage from "../assets/spaceship.png";
+import asteroidImage from "../assets/asteroid.png";
 
 const Game = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -102,24 +104,27 @@ const Game = () => {
     }
   }, [lives]);
 
+  const Asteroid = ({ enemy }) => (
+    <div
+      className="absolute w-12 h-12"
+      style={{ left: enemy.x, top: enemy.y }}
+    >
+      <img src={asteroidImage} alt="asteroid" className="w-full h-full object-contain"/>
+    </div>
+  );
+
   const Spaceship = () => (
     <div
       id="spaceship"
       ref={spaceshipRef}
-      className="absolute bottom-12 w-10 h-12 bg-red-500 border-r-4 border-red-700"
-      style={{ left: spaceshipX }}
+      className="absolute bottom-12 w-10 h-12"
+      style={{ left: spaceshipX, bottom: "4.5rem" }}
     >
-      {/* Top Fin */}
-      <div className="absolute top-[-20px] left-0 w-0 h-0 border-b-[25px] border-b-red-700 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent"></div>
-      <div className="absolute top-[-18px] left-0 w-0 h-0 border-b-[20px] border-b-red-500 border-l-[16px] border-l-transparent border-r-[16px] border-r-transparent"></div>
-
-      {/* Wings */}
-      <div className="absolute bottom-[10px] left-[-10px] w-2.5 h-5 bg-red-500"></div>
-      <div className="absolute bottom-[10px] right-[-10px] w-2.5 h-5 bg-red-700"></div>
-
-      {/* Flames */}
-      <div className="absolute bottom-0 left-2.5 w-0 h-0 border-t-[25px] border-t-orange-500 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent animate-flame"></div>
-      <div className="absolute bottom-0 left-[20px] w-0 h-0 border-t-[25px] border-t-orange-500 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent animate-flame"></div>
+      <img
+        src={spaceshipImage}
+        alt="Spaceship"
+        className="w-full h-full object-contain"
+      />
     </div>
   );
 
@@ -144,10 +149,16 @@ const Game = () => {
 
       {gameStarted && (
         <>
-          <h1 id="killCount" className="absolute top-2 left-2 text-green-500 text-4xl">
+          <h1
+            id="killCount"
+            className="absolute top-2 left-2 text-green-500 text-4xl"
+          >
             Kills: {kills}
           </h1>
-          <h1 id="livesCount" className="absolute top-2 right-2 text-red-500 text-4xl">
+          <h1
+            id="livesCount"
+            className="absolute top-2 right-2 text-red-500 text-4xl"
+          >
             Lives: {lives}
           </h1>
 
@@ -162,11 +173,7 @@ const Game = () => {
           ))}
 
           {enemies.map((enemy, index) => (
-            <div
-              key={index}
-              className="absolute w-12 h-12 bg-yellow-500"
-              style={{ left: enemy.x, top: enemy.y }}
-            ></div>
+            <Asteroid key={index} enemy={enemy}/>
           ))}
         </>
       )}
