@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import spaceshipImage from "../assets/spaceship.png";
 import asteroidImage from "../assets/asteroid.png";
+import laserImage from "../assets/laser.png";
 
 const Game = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -104,12 +105,26 @@ const Game = () => {
     }
   }, [lives]);
 
-  const Asteroid = ({ enemy }) => (
+  const Laser = ({ laser }) => (
     <div
-      className="absolute w-12 h-12"
-      style={{ left: enemy.x, top: enemy.y }}
+      className="absolute w-4 h-4"
+      style={{ left: laser.x, top: laser.y }}
     >
-      <img src={asteroidImage} alt="asteroid" className="w-full h-full object-contain"/>
+      <img
+        src={laserImage}
+        alt="asteroid"
+        className="w-full h-full object-contain"
+      />
+    </div>
+  );
+
+  const Asteroid = ({ enemy }) => (
+    <div className="absolute w-12 h-12" style={{ left: enemy.x, top: enemy.y }}>
+      <img
+        src={asteroidImage}
+        alt="asteroid"
+        className="w-full h-full object-contain"
+      />
     </div>
   );
 
@@ -165,15 +180,11 @@ const Game = () => {
           <Spaceship />
 
           {lasers.map((laser, index) => (
-            <div
-              key={index}
-              className="absolute w-2 h-4 bg-green-400"
-              style={{ left: laser.x, top: laser.y }}
-            ></div>
+            <Laser key={index} laser={laser} />
           ))}
 
           {enemies.map((enemy, index) => (
-            <Asteroid key={index} enemy={enemy}/>
+            <Asteroid key={index} enemy={enemy} />
           ))}
         </>
       )}
