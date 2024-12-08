@@ -146,20 +146,20 @@ const Game = () => {
   return (
     <div
       id="space"
-      className={`relative w-full h-screen bg-gray-900 overflow-hidden ${
+      className={`relative w-full h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 overflow-hidden ${
         gameStarted ? "cursor-none" : ""
       }`}
       onMouseMove={handleMouseMove}
       onClick={handleMouseClick}
     >
       {!gameStarted && (
-        <div
-          id="start"
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl text-white bg-red-600 px-10 py-5 cursor-pointer hover:bg-red-700"
-          onClick={startGame}
-        >
-          Start Game
-        </div>
+        <button
+        id="start"
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl w-64 md:w-80 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-lg py-3 rounded-lg hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
+        onClick={startGame}
+      >
+        START GAME
+      </button>
       )}
 
       {gameStarted && (
