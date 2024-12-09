@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useGlobalContext } from "../context";
+import NFTCard from "../components/NFTCard.jsx"
 
 const Profile = ({ ownedNFTs }) => {
   const { contracts, accounts } = useGlobalContext();
@@ -59,32 +60,6 @@ const Profile = ({ ownedNFTs }) => {
       alert("All fields are required!");
       return;
     }
-
-    try {
-      // Example process for file upload (e.g., to IPFS) and contract interaction
-      const formData = new FormData();
-      formData.append("file", mintData.image);
-
-      // Replace with actual API call for uploading to IPFS or another service
-      const response = await fetch("YOUR_UPLOAD_URL_HERE", {
-        method: "POST",
-        body: formData,
-      });
-
-      const { url } = await response.json();
-
-      // Interact with smart contract to mint NFT
-      await contracts.SpaceWars.methods
-        .mintNFT(mintData.name, mintData.description, url)
-        .send({ from: accounts[0] });
-
-      alert("NFT minted successfully!");
-      setMintData({ name: "", description: "", image: null });
-      setIsMintModalOpen(false);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to mint NFT.");
-    }
   };
 
   return (
@@ -110,7 +85,7 @@ const Profile = ({ ownedNFTs }) => {
         <h2 className="text-3xl font-semibold text-center text-gray-200 mb-6">
           Owned NFTs
         </h2>
-        {/* Existing NFT display code */}
+        <NFTCard nft={{}} />
         {ownedNFTs?.skins?.length > 0 && (
           <div className="mb-10">
             {/* Rocket Skins */}
@@ -123,15 +98,13 @@ const Profile = ({ ownedNFTs }) => {
         )}
       </div>
 
-      {/* Button to open mint modal */}
       <button
         onClick={() => setIsMintModalOpen(true)}
-        className="mt-8 p-3 rounded-lg bg-green-500 hover:bg-green-600 text-white font-bold"
+        className="mt-8 p-3 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500  text-lg py-3 hover:from-purple-500 hover:to-blue-500 text-white font-bold"
       >
         Mint New NFT
       </button>
 
-      {/* Mint NFT Modal */}
       {isMintModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-11/12 md:w-1/2">
