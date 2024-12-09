@@ -1,6 +1,6 @@
 ## **Introduction**
 
-The **Space Shooter Blockchain Project** is an innovative fusion of gaming and blockchain technology. It allows users to engage in a thrilling space shooter game while leveraging the benefits of decentralized NFT ownership.
+The **SpaceWars** is an innovative fusion of gaming and blockchain technology. It allows users to engage in a thrilling space shooter game while leveraging the benefits of decentralized NFT ownership.
 
 ### **Key Features**
 1. **Space Shooter Game**  
