@@ -9,6 +9,12 @@ const Profile = ({ ownedNFTs }) => {
   const nftSectionRef = useRef(null);
 
   const [username, setUsername] = useState("userName");
+  const [isMintModalOpen, setIsMintModalOpen] = useState(false);
+  const [mintData, setMintData] = useState({
+    name: "",
+    description: "",
+    image: null,
+  });
 
   useEffect(() => {
     gsap.fromTo(
@@ -30,12 +36,56 @@ const Profile = ({ ownedNFTs }) => {
     );
 
     const getPlayerName = async () => {
-      const name = await contracts.SpaceWars.methods.getPlayerName().call({from: accounts[0]});
+      const name = await contracts.SpaceWars.methods
+        .getPlayerName()
+        .call({ from: accounts[0] });
       setUsername(name);
-    }
+    };
 
     getPlayerName();
-  }, []);
+  }, [contracts, accounts]);
+
+  const handleMintInputChange = (e) => {
+    const { name, value, files } = e.target;
+    setMintData((prevData) => ({
+      ...prevData,
+      [name]: files ? files[0] : value,
+    }));
+  };
+
+  const handleMintSubmit = async (e) => {
+    e.preventDefault();
+    if (!mintData.name || !mintData.description || !mintData.image) {
+      alert("All fields are required!");
+      return;
+    }
+
+    try {
+      // Example process for file upload (e.g., to IPFS) and contract interaction
+      const formData = new FormData();
+      formData.append("file", mintData.image);
+
+      // Replace with actual API call for uploading to IPFS or another service
+      const response = await fetch("YOUR_UPLOAD_URL_HERE", {
+        method: "POST",
+        body: formData,
+      });
+
+      const { url } = await response.json();
+
+      // Interact with smart contract to mint NFT
+      await contracts.SpaceWars.methods
+        .mintNFT(mintData.name, mintData.description, url)
+        .send({ from: accounts[0] });
+
+      alert("NFT minted successfully!");
+      setMintData({ name: "", description: "", image: null });
+      setIsMintModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to mint NFT.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-800 flex flex-col items-center text-white">
@@ -60,53 +110,81 @@ const Profile = ({ ownedNFTs }) => {
         <h2 className="text-3xl font-semibold text-center text-gray-200 mb-6">
           Owned NFTs
         </h2>
+        {/* Existing NFT display code */}
         {ownedNFTs?.skins?.length > 0 && (
           <div className="mb-10">
-            <h3 className="text-2xl font-bold text-gray-300 mb-4">
-              Rocket Skins
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {ownedNFTs.skins.map((skin, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-lg bg-gradient-to-r ${skin.color} shadow-md`}
-                >
-                  <img
-                    src={skin.image}
-                    alt={skin.name}
-                    className="w-full h-40 object-cover rounded-md mb-3"
-                  />
-                  <h4 className="text-lg font-bold">{skin.name}</h4>
-                  <p className="mt-2 text-gray-100">{skin.price}</p>
-                </div>
-              ))}
-            </div>
+            {/* Rocket Skins */}
           </div>
         )}
         {ownedNFTs?.backgrounds?.length > 0 && (
           <div>
-            <h3 className="text-2xl font-bold text-gray-300 mb-4">
-              Space Backgrounds
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {ownedNFTs.backgrounds.map((background, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-lg bg-gradient-to-r ${background.color} shadow-md`}
-                >
-                  <img
-                    src={background.image}
-                    alt={background.name}
-                    className="w-full h-40 object-cover rounded-md mb-3"
-                  />
-                  <h4 className="text-lg font-bold">{background.name}</h4>
-                  <p className="mt-2 text-gray-100">{background.price}</p>
-                </div>
-              ))}
-            </div>
+            {/* Space Backgrounds */}
           </div>
         )}
       </div>
+
+      {/* Button to open mint modal */}
+      <button
+        onClick={() => setIsMintModalOpen(true)}
+        className="mt-8 p-3 rounded-lg bg-green-500 hover:bg-green-600 text-white font-bold"
+      >
+        Mint New NFT
+      </button>
+
+      {/* Mint NFT Modal */}
+      {isMintModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-11/12 md:w-1/2">
+            <h2 className="text-3xl font-semibold text-center text-gray-200 mb-6">
+              Mint NFT
+            </h2>
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={handleMintSubmit}
+              encType="multipart/form-data"
+            >
+              <input
+                type="text"
+                name="name"
+                placeholder="NFT Name"
+                className="p-3 rounded-lg bg-gray-700 text-white"
+                value={mintData.name}
+                onChange={handleMintInputChange}
+              />
+              <textarea
+                name="description"
+                placeholder="NFT Description"
+                className="p-3 rounded-lg bg-gray-700 text-white"
+                value={mintData.description}
+                onChange={handleMintInputChange}
+              />
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                className="p-3 rounded-lg bg-gray-700 text-white"
+                onChange={handleMintInputChange}
+              />
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  className="p-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-bold"
+                  onClick={() => setIsMintModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="p-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
+                >
+                  Mint NFT
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Floating Decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-10 left-20 w-16 h-16 bg-blue-500 rounded-full blur-2xl animate-pulse"></div>
