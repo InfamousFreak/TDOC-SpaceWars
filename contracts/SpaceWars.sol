@@ -10,6 +10,10 @@ contract SpaceWars {
         playerName[msg.sender] = name;
     }
 
+    function isPlayerRegistered(address player) public view returns (bool) {
+        return bytes(playerName[player]).length > 0;
+    }
+
     function getPlayerName() public view returns(string memory) {
         require(bytes(playerName[msg.sender]).length > 0, "Player not registered");
         return playerName[msg.sender];
