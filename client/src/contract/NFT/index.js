@@ -1,4 +1,4 @@
 import contract from "./NFT.json";
 
-export const ADDRESS = "0x4b452314269d5f19Eba3C9E6F7f8E43858c50dDb";
+export const ADDRESS = "0x0899E72291FB55E7848476A7b132581fB94E9549";
 export const { abi: ABI } = contract;

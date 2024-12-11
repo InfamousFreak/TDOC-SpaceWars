@@ -29,11 +29,23 @@ const Home = () => {
   
 
   const connectWallet = async () => {
-    const acc = await window.ethereum.request({ method: "eth_requestAccounts" });
-    setAccounts(acc);
-
-    console.log(accounts);
+    try {
+      const acc = await window.ethereum.request({ method: "eth_requestAccounts" });
+      setAccounts(acc); 
+      console.log("Account connected: ", acc[0]);
+      const alreadyRegistered = await contracts.SpaceWars.methods.isPlayerRegistered(acc[0]).call();
+  
+      if (alreadyRegistered) {
+        console.log("Navigating.....");
+        navigate("/profile"); 
+      } else {
+        console.log("Player is not registered");
+      }
+    } catch (error) {
+      console.error("Error connecting wallet: ", error);
+    }
   }
+  
 
   useEffect(() => {
     // Title and Subtitle Animations
