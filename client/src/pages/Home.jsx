@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGlobalContext } from "../context";
+import { useNavigate } from "react-router-dom";
 // import Web3 from 'web3';
 
 const Home = () => {
@@ -10,15 +11,22 @@ const Home = () => {
   const subtitleRef = useRef(null);
   const formRef = useRef(null);
   const decorationsRef = useRef([]);
+  const navigate = useNavigate();
 
   const handleRegister = () => {
-
     const registerPlayer = async () => {
-      await contracts.SpaceWars.methods.registerPlayer(username).send({from: accounts[0]});
-    }
-
+      try {
+        await contracts.SpaceWars.methods.registerPlayer(username).send({ from: accounts[0] });
+        navigate("/profile");
+      } catch (error) {
+        console.log("Registration failed:", error);
+        alert("An error occurred during registration. Please try again.");
+      }
+    };
+  
     registerPlayer();
-  }
+  };
+  
 
   const connectWallet = async () => {
     const acc = await window.ethereum.request({ method: "eth_requestAccounts" });

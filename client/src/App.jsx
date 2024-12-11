@@ -12,15 +12,15 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <Navbar />
-        <GlobalContextProvider>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/game" element={<Game />} />
-            <Route path="/market" element={<Market />} />
-          </Routes>
-        </GlobalContextProvider>
+      <GlobalContextProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/game" element={<Game />} />
+          <Route path="/market" element={<Market />} />
+        </Routes>
+      </GlobalContextProvider>
     </BrowserRouter>
   );
 };
