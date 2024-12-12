@@ -3,33 +3,35 @@ import { NavLink, Link } from "react-router-dom";
 import { useGlobalContext } from "../context";
 
 const Navbar = () => {
-  const [isRegistered, setIsRegistered] = useState(false);
-
-  const { contracts, accounts } = useGlobalContext();
+  const { contracts, accounts, isRegistered, updateRegistrationStatus } = useGlobalContext();
 
   useEffect(() => {
-    const nameExists = async () => {
-      if (!contracts || !accounts) return;
-      const name = await contracts.SpaceWars.methods
-        .getPlayerName()
-        .call({ from: accounts[0] });
-      try {
-        if (name) {
-          setIsRegistered(true);
-          console.log("Username : ", name);
-          return;
-        } else {
-          setIsRegistered(false);
-          alert("User is not registered !");
-          return;
-        }
-      } catch (error) {
-        alert(error);
-        console.log(error);
-      }
-    };
-    nameExists();
-  }, [contracts, accounts]);
+    updateRegistrationStatus();
+  }, [updateRegistrationStatus]);
+
+  // useEffect(() => {
+  //   const nameExists = async () => {
+  //     if (!contracts || !accounts) return;
+  //     const name = await contracts.SpaceWars.methods
+  //       .getPlayerName()
+  //       .call({ from: accounts[0] });
+  //     try {
+  //       if (name) {
+  //         setIsRegistered(true);
+  //         console.log("Username : ", name);
+  //         return;
+  //       } else {
+  //         setIsRegistered(false);
+  //         alert("User is not registered !");
+  //         return;
+  //       }
+  //     } catch (error) {
+  //       alert(error);
+  //       console.log(error);
+  //     }
+  //   };
+  //   nameExists();
+  // }, [contracts, accounts]);
 
   return (
     <nav className="bg-gradient-to-b from-gray-900 to-black px-6 py-4 flex justify-between items-center shadow-lg">

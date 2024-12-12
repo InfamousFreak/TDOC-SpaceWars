@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 // import Web3 from 'web3';
 
 const Home = () => {
-  const { contracts, accounts, setAccounts } = useGlobalContext();
+  const { contracts, accounts, setAccounts, updateRegistrationStatus } = useGlobalContext();
   const [username, setUsername] = useState("");
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
@@ -17,6 +17,7 @@ const Home = () => {
     const registerPlayer = async () => {
       try {
         await contracts.SpaceWars.methods.registerPlayer(username).send({ from: accounts[0] });
+        updateRegistrationStatus();
         navigate("/profile");
       } catch (error) {
         console.log("Registration failed:", error);
