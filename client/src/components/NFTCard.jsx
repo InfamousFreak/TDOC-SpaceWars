@@ -3,15 +3,16 @@ import { useGlobalContext } from "../context";
 import "../index.css";
 
 const NFTCard = ({ nft }) => {
-  const { contracts, accounts, setActiveSkin , activeSkin} = useGlobalContext();
+  const { contracts, accounts, setActiveSkin , activeSkin, setActiveBackground, activeBackground} = useGlobalContext();
 
   const [isListModalOpen, setIsListModalOpen] = useState(false);
   const [price, setPrice] = useState(0);
 
-  const handleSkinChange = () => {
-    console.log("Setting active skin to:", nft.image); 
-    setActiveSkin(nft.image); 
-    console.log(activeSkin)
+  const handleChange = () => {
+    if(nft.type == "spaceship") 
+      setActiveSkin(nft.image); 
+    else 
+      setActiveBackground(nft.image);
   };
 
   useEffect(() => {
@@ -39,7 +40,7 @@ const NFTCard = ({ nft }) => {
   };
 
   return (
-    <div className="w-64 p-4 rounded-lg bg-gradient-to-b from-gray-700 via-gray-800 to-gray-900 shadow-lg">
+    <div className="w-64 p-4 rounded-lg bg-gradient-to-b from-gray-700 via-gray-800 to-gray-900 shadow-lg mt-5">
       <div className="w-fill h-40 md:h-60 flex items-center justify-center bg-gray-600 rounded-md overflow-hidden">
         <img
           src={nft.image}
@@ -61,7 +62,7 @@ const NFTCard = ({ nft }) => {
         </button>
         <button
           className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white font-bold"
-          onClick={handleSkinChange}
+          onClick={handleChange}
         >
           Use
         </button>

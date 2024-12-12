@@ -146,7 +146,7 @@ const Profile = () => {
 
       <button
         onClick={() => setIsMintModalOpen(true)}
-        className="mt-8 p-3 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500  text-lg py-3 hover:from-purple-500 hover:to-blue-500 text-white font-bold"
+        className="mt-8 p-3 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500  text-lg py-3 hover:from-purple-500 hover:to-blue-500 text-white font-bold mb-5"
       >
         {isMinting ? "Minting..." : "Mint New NFT"}
       </button>
