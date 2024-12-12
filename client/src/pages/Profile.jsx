@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useGlobalContext } from "../context";
-import NFTCard from "../components/NFTCard.jsx"
+import NFTCard from "../components/NFTCard.jsx";
 import { useStorage } from "@thirdweb-dev/react";
 
 const Profile = () => {
-
   const storage = useStorage();
 
   const { contracts, accounts } = useGlobalContext();
@@ -22,27 +21,32 @@ const Profile = () => {
     image: null,
   });
   const [ownedNFTs, setOwnedNFTs] = useState([]);
+  const [isMinting, setIsMinting] = useState(false);  
 
   const handleMintNFT = () => {
-
     const mintNFT = async (uri) => {
-      const tokenId = await contracts.NFT_MarketPlace.methods.createNFT(uri).send({ from: accounts[0] });
-    }
+      setIsMinting(true); 
+      try {
+        const tokenId = await contracts.NFT_MarketPlace.methods
+          .createNFT(uri)
+          .send({ from: accounts[0] });
+        console.log("NFT minted with token ID:", tokenId);
+      } catch (error) {
+        console.error("Minting failed:", error);
+      } finally {
+        setIsMinting(false);  // Set minting back to false after the process is done
+      }
+    };
 
     const ipfsUpload = async () => {
       const uri = await storage.upload(mintData);
-
       console.log(uri);
-
       mintNFT(uri);
-    }
+    };
 
     ipfsUpload();
-
     setIsMintModalOpen(false);
-
-    // mintNFT();
-  }
+  };
 
   useEffect(() => {
     gsap.fromTo(
@@ -64,20 +68,29 @@ const Profile = () => {
     );
 
     const getPlayerName = async () => {
-      const name = await contracts.SpaceWars.methods.getPlayerName().call({ from: accounts[0] });
+      const name = await contracts.SpaceWars.methods
+        .getPlayerName()
+        .call({ from: accounts[0] });
       setUsername(name);
-    }
+    };
 
     const getNFTs = async () => {
-      const tokenIds = await contracts.NFT_MarketPlace.methods.getOwnedNFTs().call({ from: accounts[0] });
+      const tokenIds = await contracts.NFT_MarketPlace.methods
+        .getOwnedNFTs()
+        .call({ from: accounts[0] });
       console.log(tokenIds);
 
       const fetchNFTData = async (tokenId) => {
-        const tokenURI = await contracts.NFT_MarketPlace.methods.tokenURI(tokenId).call({ from: accounts[0] });
+        const tokenURI = await contracts.NFT_MarketPlace.methods
+          .tokenURI(tokenId)
+          .call({ from: accounts[0] });
         const dataUrl = tokenURI.replace("ipfs://", "https://ipfs.io/ipfs/");
         const response = await fetch(dataUrl, {});
         let jsonData = await response.json();
-        jsonData.image = jsonData.image.replace("ipfs://", "https://ipfs.io/ipfs/");
+        jsonData.image = jsonData.image.replace(
+          "ipfs://",
+          "https://ipfs.io/ipfs/"
+        );
         jsonData.tokenId = tokenId;
         return jsonData;
       };
@@ -85,15 +98,8 @@ const Profile = () => {
       const NFTs = await Promise.all(tokenIds.map(fetchNFTData));
 
       console.log(NFTs);
-
       setOwnedNFTs(NFTs);
-
-      ownedNFTs.map((NFT) => {
-        console.log(NFT);
-      })
-
-      console.log(ownedNFTs.length);
-    }
+    };
 
     getPlayerName();
     getNFTs();
@@ -125,7 +131,7 @@ const Profile = () => {
       </div>
       <div
         ref={nftSectionRef}
-        className="mt-10 w-11/12 md:w-3/4 bg-gray-800 p-6 rounded-lg shadow-lg"
+        className="mt-10 w-11/12 md:w-2/4 bg-gray-800 p-6 rounded-lg shadow-lg"
       >
         <h2 className="text-3xl font-semibold text-center text-gray-200 mb-6">
           Owned NFTs
@@ -136,35 +142,13 @@ const Profile = () => {
             <NFTCard nft={NFT} key={index} />
           ))}
         </div>
-
       </div>
-
-
-      {/* <div className="mt-10 w-11/12 md:w-3/4 h-[250px] bg-gray-800 p-6 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-semibold text-center text-gray-200 mb-6">
-          Mint NFT
-        </h2>
-        <div className="flex flex-col items-center justify-evenly h-[80%]">
-          <input
-            type="text"
-            placeholder="NFT Name"
-            value={NFTName}
-            onChange={(e) => setNFTName(e.target.value)}
-            className="w-[30%] h-[30%] p-5 text-black font-medium text-xl" />
-          <button
-            className="w-64 md:w-80 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-lg py-3 rounded-lg hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
-            onClick={handleMintNFT}
-          >
-            Mint NFT
-          </button>
-        </div>
-      </div> */}
 
       <button
         onClick={() => setIsMintModalOpen(true)}
         className="mt-8 p-3 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500  text-lg py-3 hover:from-purple-500 hover:to-blue-500 text-white font-bold"
       >
-        Mint New NFT
+        {isMinting ? "Minting..." : "Mint New NFT"}
       </button>
 
       {isMintModalOpen && (
@@ -173,9 +157,7 @@ const Profile = () => {
             <h2 className="text-3xl font-semibold text-center text-gray-200 mb-6">
               Mint NFT
             </h2>
-            <div
-              className="flex flex-col gap-4"
-            >
+            <div className="flex flex-col gap-4">
               <input
                 type="text"
                 name="name"
@@ -195,8 +177,11 @@ const Profile = () => {
                 name="type"
                 className="p-3 rounded-lg bg-gray-700 text-white"
                 value={mintData.type}
-                onChange={handleMintInputChange}>
-                <option value="" disabled>Select an option</option>
+                onChange={handleMintInputChange}
+              >
+                <option value="" disabled>
+                  Select an option
+                </option>
                 <option value="spaceship">Spaceship</option>
                 <option value="background">Background</option>
               </select>

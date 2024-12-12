@@ -42,12 +42,17 @@ const NFTCard = ({ nft }) => {
         <h4 className="text-xl font-semibold text-gray-200">{nft.name}</h4>
         <p className="text-sm text-gray-400 mt-2">{nft.description}</p>
       </div>
-      <div className="mt-4 flex justify-center">
+      <div className="mt-4 flex justify-center gap-5">
         <button
           className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold"
           onClick={() => setIsListModalOpen(!isListModalOpen)}
         >
           List
+        </button>
+        <button
+          className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white font-bold"
+        >
+          Use
         </button>
       </div>
 
