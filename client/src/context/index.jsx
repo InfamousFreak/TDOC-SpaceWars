@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 // import Web3Modal from "web3modal";
-import { NFT_ADDRESS, NFT_ABI, NFT_MarketPlace_ADDRESS, NFT_MarketPlace_ABI, SpaceWars_ADDRESS, SpaceWars_ABI } from '../contract/contractConfig.js';
+import { NFT_MarketPlace_ADDRESS, NFT_MarketPlace_ABI, SpaceWars_ADDRESS, SpaceWars_ABI } from '../contract/contractConfig.js';
 import Web3 from 'web3';
 
 const GlobalContext = createContext();
@@ -9,7 +9,6 @@ export const GlobalContextProvider = ({ children }) => {
 
   const [accounts, setAccounts] = useState([]);
   const [contracts, setContracts] = useState({
-    NFT: '',
     NFT_MarketPlace: '',
     SpaceWars: ''
   });
@@ -18,12 +17,10 @@ export const GlobalContextProvider = ({ children }) => {
     try {
       const web3 = new Web3(window.ethereum);
 
-      const NFT_Contract = new web3.eth.Contract(NFT_ABI, NFT_ADDRESS);
       const NFT_MarketPlace_Contract = new web3.eth.Contract(NFT_MarketPlace_ABI, NFT_MarketPlace_ADDRESS);
       const SpaceWars_Contract = new web3.eth.Contract(SpaceWars_ABI, SpaceWars_ADDRESS);
       
       setContracts({
-        NFT: NFT_Contract,
         NFT_MarketPlace: NFT_MarketPlace_Contract,
         SpaceWars: SpaceWars_Contract
       });

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { useGlobalContext } from "../context";
 import "../utilities/scrollable.css";
 
 const skins = [
@@ -45,6 +46,7 @@ const backgrounds = [
 ];
 
 const Market = () => {
+  const { contracts, accounts } = useGlobalContext();
   const [selectedItem, setSelectedItem] = useState(null);
   const titleRef = useRef(null);
   const subtitleRef = useRef(null);
@@ -53,6 +55,27 @@ const Market = () => {
   const skinsItemsRef = useRef([]);
   const backgroundsItemsRef = useRef([]);
   const overlayRef = useRef(null);
+
+  const [spaceshipNFTs, setSpaceshipNFTs] = useState([]);
+  const [backgroundNFTs, setBackgroundNFTs] = useState([]);
+
+  const handleBuyNFT = (e) => {
+
+    console.log(selectedItem);
+
+    const buyNFT = async () => {
+      const result = await contracts.NFT_MarketPlace.methods.buyNFT(selectedItem.tokenId.tokenId).send({
+        from: accounts[0],
+        value: selectedItem.price
+      });
+
+      console.log(result);
+    }
+
+    buyNFT();
+
+  }
+
 
   useEffect(() => {
     gsap.fromTo(
@@ -72,7 +95,43 @@ const Market = () => {
       { opacity: 0, scale: 0.9 },
       { opacity: 1, scale: 1, duration: 1.2, delay: 0.7, ease: "power4.out" }
     );
-  }, []);
+
+    const getNFTs = async () => {
+      const tokenIds = await contracts.NFT_MarketPlace.methods.getListedNFTs().call({ from: accounts[0] });
+
+      const fetchNFTData = async (tokenId) => {
+        const tokenURI = await contracts.NFT_MarketPlace.methods.tokenURI(tokenId.tokenId).call({ from: accounts[0] });
+        const dataUrl = tokenURI.replace("ipfs://", "https://ipfs.io/ipfs/");
+        const response = await fetch(dataUrl);
+        let jsonData = await response.json();
+        jsonData.image = jsonData.image.replace("ipfs://", "https://ipfs.io/ipfs/");
+        jsonData.tokenId = tokenId;
+        jsonData.price = tokenId.price;
+        return jsonData;
+      };
+
+      const NFTs = await Promise.all(tokenIds.map(fetchNFTData));
+
+      let spaceships = [];
+      for (let i = 0; i < NFTs.length; i++) {
+        if (NFTs[i].type === "spaceship") {
+          spaceships.push(NFTs[i]);
+        }
+      }
+      setSpaceshipNFTs(spaceships);
+
+      let backgrounds = [];
+      for (let i = 0; i < NFTs.length; i++) {
+        if (NFTs[i].type === "background") {
+          backgrounds.push(NFTs[i]);
+        }
+      }
+      setBackgroundNFTs(backgrounds);
+
+    }
+
+    getNFTs();
+  }, [contracts, accounts]);
 
   const closeOverlay = () => setSelectedItem(null);
 
@@ -97,20 +156,21 @@ const Market = () => {
           Rocket Skins
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {skins.map((skin, index) => (
+          {spaceshipNFTs.map((skin, index) => (
             <div
               ref={(el) => (skinsItemsRef.current[index] = el)}
-              key={skin.name}
+              key={index}
               className={`p-4 rounded-lg bg-gradient-to-r bg-gray-500 shadow-md hover:scale-105 transform transition-transform duration-300`}
               onClick={() => setSelectedItem(skin)}
             >
               <img
                 src={skin.image}
+                // src='../../public/vite.svg'
                 alt={skin.name}
                 className="w-full h-40 object-cover rounded-md mb-3"
               />
               <h3 className="text-lg font-bold">{skin.name}</h3>
-              <p className="mt-2 text-gray-100">{skin.price}</p>
+              <p className="mt-2 text-gray-100">{Number(skin.price)}</p>
             </div>
           ))}
         </div>
@@ -125,10 +185,10 @@ const Market = () => {
           Space Backgrounds
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {backgrounds.map((background, index) => (
+          {backgroundNFTs.map((background, index) => (
             <div
               ref={(el) => (backgroundsItemsRef.current[index] = el)}
-              key={background.name}
+              key={index}
               className={`p-4 rounded-lg bg-gradient-to-r bg-gray-500 shadow-md hover:scale-105 transform transition-transform duration-300`}
               onClick={() => setSelectedItem(background)}
             >
@@ -138,7 +198,7 @@ const Market = () => {
                 className="w-full h-40 object-cover rounded-md mb-3"
               />
               <h3 className="text-lg font-bold">{background.name}</h3>
-              <p className="mt-2 text-gray-100">{background.price}</p>
+              <p className="mt-2 text-gray-100">{Number(background.price)}</p>
             </div>
           ))}
         </div>
@@ -158,7 +218,7 @@ const Market = () => {
               className="w-full h-40 object-cover rounded-md mb-4"
             />
             <p className="text-lg font-semibold text-gray-300 mb-6">
-              Price: {selectedItem.price}
+              Price: {Number(selectedItem.price)}
             </p>
             <div className="flex gap-4 justify-center mt-4">
               <button
@@ -167,7 +227,9 @@ const Market = () => {
               >
                 Close
               </button>
-              <button className="px-6 py-2 w-36 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg text-white font-bold hover:from-blue-500 hover:to-green-500 transition-all">
+              <button
+                onClick={handleBuyNFT}
+                className="px-6 py-2 w-36 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg text-white font-bold hover:from-blue-500 hover:to-green-500 transition-all">
                 Purchase
               </button>
             </div>

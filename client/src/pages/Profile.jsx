@@ -26,8 +26,7 @@ const Profile = () => {
   const handleMintNFT = () => {
 
     const mintNFT = async (uri) => {
-      // const tokenId = await contracts.NFT.methods.createNFT(uri).send({ from: accounts[0] });
-      console.log(tokenId);
+      const tokenId = await contracts.NFT_MarketPlace.methods.createNFT(uri).send({ from: accounts[0] });
     }
 
     const ipfsUpload = async () => {
@@ -70,13 +69,13 @@ const Profile = () => {
     }
 
     const getNFTs = async () => {
-      const tokenIds = await contracts.NFT.methods.getOwnedNFTs().call({ from: accounts[0] });
+      const tokenIds = await contracts.NFT_MarketPlace.methods.getOwnedNFTs().call({ from: accounts[0] });
       console.log(tokenIds);
 
       const fetchNFTData = async (tokenId) => {
-        const tokenURI = await contracts.NFT.methods.tokenURI(tokenId).call({ from: accounts[0] });
+        const tokenURI = await contracts.NFT_MarketPlace.methods.tokenURI(tokenId).call({ from: accounts[0] });
         const dataUrl = tokenURI.replace("ipfs://", "https://ipfs.io/ipfs/");
-        const response = await fetch(dataUrl);
+        const response = await fetch(dataUrl, {});
         let jsonData = await response.json();
         jsonData.image = jsonData.image.replace("ipfs://", "https://ipfs.io/ipfs/");
         jsonData.tokenId = tokenId;

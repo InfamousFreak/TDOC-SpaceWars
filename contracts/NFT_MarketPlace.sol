@@ -1,57 +1,94 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./NFT.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
-struct NFTListing {
+struct Token {
+    uint256 tokenId;
     uint256 price;
-    address seller;
+    address payable seller;
 }
 
-contract NFT_MarketPlace is Ownable, NFT {
+contract NFT_MarketPlace is ERC721URIStorage {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIDs;
 
-    mapping(uint256 => NFTListing) private _listings;
+    constructor() ERC721("GameItem", "ITM") {}
+    mapping(uint256 => Token) private _item;
+    mapping(address => uint256[]) private ownedNFTs;
+
+    Token[] private _items;
+
+    function createNFT(string calldata tokenURI) public {
+        _tokenIDs.increment();
+        uint256 currentID = _tokenIDs.current();
+        _safeMint(msg.sender, currentID);
+        _setTokenURI(currentID, tokenURI);
+        ownedNFTs[msg.sender].push(_tokenIDs.current());
+    }
+
+    function getOwnedNFTs() public view returns (uint256[] memory) {
+        return ownedNFTs[msg.sender];
+    }
+
+    function getListedNFTs() public view returns (Token[] memory) {
+        return _items;
+    }
 
     function listNFT(uint256 tokenID, uint256 price) public {
         require(price > 0, "NFTMarket: price must be greater than 0");
-        ERC721(address(this)).transferFrom(msg.sender, address(this), tokenID);
-        // Remove NFT from the sender's list
-        uint256[] storage senderNFTs = ownedNFTs[msg.sender];
-        for (uint256 i = 0; i < senderNFTs.length; i++) {
-            if (senderNFTs[i] == tokenID) {
-                senderNFTs[i] = senderNFTs[senderNFTs.length - 1];
-                senderNFTs.pop();
+        require(ownerOf(tokenID)==msg.sender, "NFTMarket: You are not the owner");
+
+        transferFrom(msg.sender, address(this), tokenID);
+
+        _item[tokenID] = Token({
+            tokenId: tokenID,
+            price: price,
+            seller: payable(msg.sender)
+        });
+        _items.push(_item[tokenID]);
+
+        // Removing from Owned NFTs
+        for (uint256 i = 0; i < ownedNFTs[msg.sender].length; i++) {
+            if (ownedNFTs[msg.sender][i] == tokenID) {
+                ownedNFTs[msg.sender][i] = ownedNFTs[msg.sender][
+                    ownedNFTs[msg.sender].length - 1
+                ];
+                ownedNFTs[msg.sender].pop();
+                break;
+            }
+        }
+    }
+
+    function buyNFT(uint256 tokenID) public payable returns (bool) {
+        require(_item[tokenID].price > 0, "NFTMarket: Item is not for sale");
+        require(
+            msg.value == _item[tokenID].price,
+            "NFTMarket: Not sufficient money transferred"
+        );
+
+        // NFT Transfer
+        ERC721(address(this)).transferFrom(address(this), msg.sender, tokenID);
+        ownedNFTs[msg.sender].push(tokenID);
+
+        // Ether Transfer
+        (bool success, ) = _item[tokenID].seller.call{value: msg.value}("");
+
+        // Clear Item
+        _item[tokenID] = Token({
+            tokenId: tokenID,
+            price: 0,
+            seller: payable(address(0))
+        });
+        for (uint256 i = 0; i < _items.length; i++) {
+            if (_items[i].tokenId == tokenID) {
+                _items[i] = _items[_items.length - 1];
+                _items.pop();
                 break;
             }
         }
 
-    }
-
-    function buyNFT(uint256 tokenID) public payable {
-        NFTListing memory listing = _listings[tokenID];
-        require(listing.price > 0, "NFTMarket: nft not listed for sale");
-        require(msg.value == listing.price, "NFTMarket: incorrect price");
-        ERC721(address(this)).transferFrom(address(this), msg.sender, tokenID);
-        ownedNFTs[msg.sender].push(tokenID);
-        clearListing(tokenID);
-        payable(listing.seller).transfer(listing.price);
-    }
-
-    function cancelListing(uint256 tokenID) public {
-        NFTListing memory listing = _listings[tokenID];
-        require(listing.price > 0, "NFTMarket: nft not listed for sale");
-        require(
-            listing.seller == msg.sender,
-            "NFTMarket: you're not the seller"
-        );
-        ERC721(address(this)).transferFrom(address(this), msg.sender, tokenID);
-        clearListing(tokenID);
-    }
-
-    function clearListing(uint256 tokenID) private {
-        _listings[tokenID].price = 0;
-        _listings[tokenID].seller = address(0);
+        return success;
     }
 }
