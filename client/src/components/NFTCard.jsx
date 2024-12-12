@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useGlobalContext } from "../context";
+import "../index.css";
 
 const NFTCard = ({ nft }) => {
   const { contracts, accounts } = useGlobalContext();
