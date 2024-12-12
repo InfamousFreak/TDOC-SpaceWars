@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { useGlobalContext } from "../context";
 import "../index.css";
 
 const NFTCard = ({ nft }) => {
-  const { contracts, accounts } = useGlobalContext();
+  const { contracts, accounts, setActiveSkin , activeSkin} = useGlobalContext();
 
   const [isListModalOpen, setIsListModalOpen] = useState(false);
   const [price, setPrice] = useState(0);
+
+  const handleSkinChange = () => {
+    console.log("Setting active skin to:", nft.image); 
+    setActiveSkin(nft.image); 
+    console.log(activeSkin)
+  };
+
+  useEffect(() => {
+    console.log("Updated activeSkin:", activeSkin);
+  }, [activeSkin]); 
 
   const handleListNFT = () => {
     console.log(price);
@@ -51,6 +61,7 @@ const NFTCard = ({ nft }) => {
         </button>
         <button
           className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white font-bold"
+          onClick={handleSkinChange}
         >
           Use
         </button>

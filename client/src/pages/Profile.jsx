@@ -21,7 +21,7 @@ const Profile = () => {
     image: null,
   });
   const [ownedNFTs, setOwnedNFTs] = useState([]);
-  const [isMinting, setIsMinting] = useState(false);  
+  const [isMinting, setIsMinting] = useState(false);
 
   const handleMintNFT = () => {
     const mintNFT = async (uri) => {

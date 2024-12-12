@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import spaceshipImage from "../assets/spaceship.png";
+import defaultSpaceshipImage from "../assets/spaceship.png";
 import asteroidImage from "../assets/asteroid.png";
 import laserImage from "../assets/laser.png";
+import { useGlobalContext } from "../context";
 
 const Game = () => {
   const [gameStarted, setGameStarted] = useState(false);
@@ -9,8 +10,24 @@ const Game = () => {
   const [kills, setKills] = useState(0);
   const [lasers, setLasers] = useState([]);
   const [enemies, setEnemies] = useState([]);
-  const [spaceshipX, setSpaceshipX] = useState(window.innerWidth / 2); // Spaceship X position
-  const spaceshipRef = useRef(null);
+  const [spaceshipX, setSpaceshipX] = useState(window.innerWidth / 2); 
+  const spaceshipRef = useRef(null); 
+  const { activeSkin } = useGlobalContext();
+
+  const Spaceship = () => (
+    <div
+      id="spaceship"
+      ref={spaceshipRef}
+      className="absolute bottom-12 w-10 h-12"
+      style={{ left: spaceshipX, bottom: "4.5rem" }}
+    >
+      <img
+        src={activeSkin || defaultSpaceshipImage}
+        alt="Spaceship"
+        className="w-full h-full object-contain"
+      />
+    </div>
+  );
 
   const startGame = () => {
     setGameStarted(true);
@@ -21,7 +38,7 @@ const Game = () => {
   };
 
   const handleMouseMove = (e) => {
-    if (!gameStarted || !spaceshipRef.current) return;
+    if (!gameStarted || !spaceshipRef.current) return;0
     const spaceshipWidth = spaceshipRef.current.offsetWidth;
     let x = e.pageX - spaceshipWidth / 2;
 
@@ -123,21 +140,6 @@ const Game = () => {
       <img
         src={asteroidImage}
         alt="asteroid"
-        className="w-full h-full object-contain"
-      />
-    </div>
-  );
-
-  const Spaceship = () => (
-    <div
-      id="spaceship"
-      ref={spaceshipRef}
-      className="absolute bottom-12 w-10 h-12"
-      style={{ left: spaceshipX, bottom: "4.5rem" }}
-    >
-      <img
-        src={spaceshipImage}
-        alt="Spaceship"
         className="w-full h-full object-contain"
       />
     </div>
