@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import defaultSpaceshipImage from "../assets/spaceship.png";
 import asteroidImage from "../assets/asteroid.png";
 import laserImage from "../assets/laser.png";
+import gameBackgroundImage from "../assets/background.jpg";
 import { useGlobalContext } from "../context";
 
 const Game = () => {
@@ -10,9 +11,9 @@ const Game = () => {
   const [kills, setKills] = useState(0);
   const [lasers, setLasers] = useState([]);
   const [enemies, setEnemies] = useState([]);
-  const [spaceshipX, setSpaceshipX] = useState(window.innerWidth / 2); 
-  const spaceshipRef = useRef(null); 
-  const { activeSkin } = useGlobalContext();
+  const [spaceshipX, setSpaceshipX] = useState(window.innerWidth / 2);
+  const spaceshipRef = useRef(null);
+  const { activeSkin , activeBackground } = useGlobalContext();
 
   const Spaceship = () => (
     <div
@@ -38,7 +39,8 @@ const Game = () => {
   };
 
   const handleMouseMove = (e) => {
-    if (!gameStarted || !spaceshipRef.current) return;0
+    if (!gameStarted || !spaceshipRef.current) return;
+    0;
     const spaceshipWidth = spaceshipRef.current.offsetWidth;
     let x = e.pageX - spaceshipWidth / 2;
 
@@ -123,10 +125,7 @@ const Game = () => {
   }, [lives]);
 
   const Laser = ({ laser }) => (
-    <div
-      className="absolute w-4 h-4"
-      style={{ left: laser.x, top: laser.y }}
-    >
+    <div className="absolute w-4 h-4" style={{ left: laser.x, top: laser.y }}>
       <img
         src={laserImage}
         alt="asteroid"
@@ -156,16 +155,25 @@ const Game = () => {
     >
       {!gameStarted && (
         <button
-        id="start"
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl w-64 md:w-80 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white text-lg py-3 rounded-lg hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
-        onClick={startGame}
-      >
-        START GAME
-      </button>
+          id="start"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl w-64 md:w-80 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white py-3 rounded-lg hover:from-purple-500 hover:to-blue-500 transition-all duration-300"
+          onClick={startGame}
+        >
+          PLAY
+        </button>
       )}
 
       {gameStarted && (
-        <>
+        <div
+          id="space"
+          className="relative w-full h-full bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${activeBackground})`,
+            backgroundSize: "cover",
+          }}
+          onMouseMove={handleMouseMove}
+          onClick={handleMouseClick}
+        >
           <h1
             id="killCount"
             className="absolute top-2 left-2 text-green-500 text-4xl"
@@ -188,7 +196,7 @@ const Game = () => {
           {enemies.map((enemy, index) => (
             <Asteroid key={index} enemy={enemy} />
           ))}
-        </>
+        </div>
       )}
     </div>
   );

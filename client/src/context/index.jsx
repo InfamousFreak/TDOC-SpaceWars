@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import defaultSpaceshipImage from "../assets/spaceship.png";
+import gameBackgroundImage from "../assets/background.jpg";
 // import Web3Modal from "web3modal";
 import {
   NFT_MarketPlace_ADDRESS,
@@ -19,6 +20,7 @@ export const GlobalContextProvider = ({ children }) => {
   });
   const [isRegistered, setIsRegistered] = useState(false);
   const [activeSkin, setActiveSkin] = useState(defaultSpaceshipImage);
+  const [activeBackground, setActiveBackground] = useState(gameBackgroundImage);
   
   const updateRegistrationStatus = async () => {
     const name = await contracts.SpaceWars.methods
@@ -69,7 +71,9 @@ export const GlobalContextProvider = ({ children }) => {
         isRegistered,
         updateRegistrationStatus,
         activeSkin,
-        setActiveSkin
+        setActiveSkin,
+        activeBackground,
+        setActiveBackground
       }}
     >
       {children}
